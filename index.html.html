@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Diagnóstica - Matemáticas Discretas y Computación</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+            background-color: #f4f6f9;
+            font-size: 10.5pt;
+            line-height: 1.5;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 18px 20px;
+            margin: -25px -30px 20px -30px;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title h1 {
+            margin: 0 0 5px 0;
+            font-size: 16pt;
+            font-weight: bold;
+        }
+        .header-title p {
+            margin: 0;
+            font-size: 9.5pt;
+            color: #ecf0f1;
+        }
+        .timer-box {
+            background: #c0392b;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11pt;
+            font-weight: bold;
+            display: none;
+        }
+        .student-info {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        .student-field label {
+            display: block;
+            font-size: 9pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        .student-field input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 10pt;
+            outline: none;
+        }
+        .student-field input:focus {
+            border-color: #3498db;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 8px;
+            margin-top: 18px;
+            margin-bottom: 10px;
+        }
+        .question {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #fafbfc;
+            border: 1px solid #e1e4e8;
+            border-radius: 4px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .options {
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .option {
+            font-size: 10pt;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 11pt;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover {
+            background: #219653;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .result-card {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        .result-score {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 8.5pt;
+            color: #7f8c8d;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body oncopy="return false" onpaste="return false" oncut="return false" oncontextmenu="return false">
+
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="header">
+            <div class="header-title">
+                <h1>EVALUACIÓN DIAGNÓSTICA</h1>
+                <p>Matemáticas Discretas & Computación Básica — 1er Semestre</p>
+            </div>
+            <div id="timer-container" class="timer-box">
+                ⏱️ <span id="timer">25:00</span>
+            </div>
+        </div>
+
+        <!-- Formulario de Registro (Paso 1) -->
+        <section id="register-section">
+            <p style="margin-bottom: 15px; color: #555;">Por favor, ingresa tus datos completos para habilitar la evaluación. Al iniciar, se activarán las restricciones de seguridad del examen.</p>
+            <form id="student-form" onsubmit="startExam(event)">
+                <div class="student-info" style="border:none; margin:0; padding:0;">
+                    <div class="student-field">
+                        <label for="student-name">Nombre Completo:</label>
+                        <input type="text" id="student-name" required placeholder="Ej. Juan Pérez López">
+                    </div>
+                    <div class="student-field">
+                        <label for="student-id">Número de Control:</label>
+                        <input type="text" id="student-id" required placeholder="Ej. 24070001">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" style="margin-top: 20px;">Comenzar Evaluación</button>
+            </form>
+        </section>
+
+        <!-- Cuestionario (Paso 2) -->
+        <section id="exam-section" class="hidden">
+            <div style="background: #eef2f7; padding: 10px 15px; border-radius: 4px; margin-bottom: 20px; font-size: 9.5pt; display: flex; justify-content: space-between;">
+                <div>Alumno: <strong id="display-name"></strong></div>
+                <div>No. Control: <strong id="display-id"></strong></div>
+            </div>
+
+            <form id="exam-form" onsubmit="submitExam(event)">
+                
+                <h2>I. Lógica Proposicional y Conjuntos</h2>
+
+                <div class="question">
+                    <div class="question-text">1. En lógica proposicional, si la proposición <span class="math">P</span> es Verdadera (V) y <span class="math">Q</span> es Falsa (F), ¿cuál es el valor de verdad de la conjunción <span class="math">P AND Q</span>?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q1" value="A" required> A) Verdadero</label>
+                        <label class="option"><input type="radio" name="q1" value="B"> B) Falso</label>
+                        <label class="option"><input type="radio" name="q1" value="C"> C) Indeterminado</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">2. Dado el conjunto <span class="math">A = {1, 2, 3}</span> y el conjunto <span class="math">B = {2, 3, 4}</span>, ¿cuál es el resultado de la intersección <span class="math">A ∩ B</span>?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q2" value="A" required> A) {1, 4}</label>
+                        <label class="option"><input type="radio" name="q2" value="B"> B) {1, 2, 3, 4}</label>
+                        <label class="option"><input type="radio" name="q2" value="C"> C) {2, 3}</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">3. Si el conjunto <span class="math">A</span> tiene <span class="math">3</span> elementos, ¿cuántos elementos (subconjuntos) contiene su conjunto potencia <span class="math">P(A)</span>?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q3" value="A" required> A) 6</label>
+                        <label class="option"><input type="radio" name="q3" value="B"> B) 8</label>
+                        <label class="option"><input type="radio" name="q3" value="C"> C) 9</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">4. ¿Cuál es el resultado de aplicar la operación lógica <span class="math">NOT (Verdadero)</span>?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q4" value="A" required> A) Verdadero</label>
+                        <label class="option"><input type="radio" name="q4" value="B"> B) Falso</label>
+                        <label class="option"><input type="radio" name="q4" value="C"> C) Nulo</label>
+                    </div>
+                </div>
+
+                <h2>II. Sistemas Numéricos y Computación Básica</h2>
+
+                <div class="question">
+                    <div class="question-text">5. ¿Cuál es el resultado de convertir el número decimal <span class="math">5</span> al sistema binario?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q5" value="A" required> A) 100</label>
+                        <label class="option"><input type="radio" name="q5" value="B"> B) 101</label>
+                        <label class="option"><input type="radio" name="q5" value="C"> C) 111</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">6. ¿Qué compuerta lógica entrega una salida verdadera (1) únicamente cuando todas sus entradas son verdaderas?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q6" value="A" required> A) OR (O)</label>
+                        <label class="option"><input type="radio" name="q6" value="B"> B) AND (Y)</label>
+                        <label class="option"><input type="radio" name="q6" value="C"> C) NOT (NO)</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">7. ¿En qué posición se encuentra el bit menos significativo dentro de un número binario estándar (ej. <span class="math">1010</span>)?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q7" value="A" required> A) A la extrema derecha</label>
+                        <label class="option"><input type="radio" name="q7" value="B"> B) A la extrema izquierda</label>
+                        <label class="option"><input type="radio" name="q7" value="C"> C) En el centro</label>
+                    </div>
+                </div>
+
+                <h2>III. Algoritmos y Estructuras Iniciales</h2>
+
+                <div class="question">
+                    <div class="question-text">8. ¿Qué es un algoritmo en el contexto de la ingeniería en sistemas computacionales?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q8" value="A" required> A) Un programa informático malicioso o virus.</label>
+                        <label class="option"><input type="radio" name="q8" value="B"> B) Una secuencia finita de instrucciones bien definidas para resolver un problema.</label>
+                        <label class="option"><input type="radio" name="q8" value="C"> C) Un componente físico de almacenamiento temporal (RAM).</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">9. En un diagrama de flujo, ¿qué estructura geométrica/lógica se utiliza para tomar decisiones basadas en una condición (Verdadero/Falso)?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q9" value="A" required> A) Estructura secuencial</label>
+                        <label class="option"><input type="radio" name="q9" value="B"> B) Estructura condicional (If / Si)</label>
+                        <label class="option"><input type="radio" name="q9" value="C"> C) Estructura de impresión en pantalla</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">10. ¿Qué representa una tabla de verdad en matemáticas discretas y lógica digital?</div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q10" value="A" required> A) Una tabla analítica para calcular promedios numéricos.</label>
+                        <label class="option"><input type="radio" name="q10" value="B"> B) Una tabla que muestra todos los valores de verdad posibles de una proposición lógica.</label>
+                        <label class="option"><input type="radio" name="q10" value="C"> C) Un registro de almacenamiento en disco duro.</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Finalizar y Enviar Evaluación</button>
+            </form>
+        </section>
+
+        <!-- Resultados (Paso 3) -->
+        <section id="result-section" class="hidden">
+            <div class="result-card">
+                <h2>¡Evaluación Concluida con Éxito!</h2>
+                <p style="color: #555; font-size: 10pt;">Tus respuestas han sido evaluadas automáticamente por el sistema.</p>
+                <div class="result-score" id="final-score">0 / 10</div>
+                <p id="feedback-text" style="font-size: 10.5pt; color: #2c3e50; font-weight: bold; margin-top: 15px;"></p>
+            </div>
+        </section>
+
+        <div class="footer">
+            Instituto Tecnológico &bull; Evaluación Diagnóstica de 1er Semestre &bull; Protección Anti-Copia Activa
+        </div>
+    </div>
+
+    <!-- Script de Control -->
+    <script>
+        const correctAnswers = {
+            q1: "B", q2: "C", q3: "B", q4: "B", q5: "B",
+            q6: "B", q7: "A", q8: "B", q9: "B", q10: "B"
+        };
+
+        let warningCount = 0;
+        let timerInterval;
+        let timeLeft = 25 * 60; // 25 minutos
+
+        function startExam(event) {
+            event.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const id = document.getElementById('student-id').value.trim();
+
+            if (!name || !id) return;
+
+            document.getElementById('display-name').textContent = name;
+            document.getElementById('display-id').textContent = id;
+
+            document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('exam-section').classList.remove('hidden');
+            document.getElementById('timer-container').style.display = 'block';
+
+            startTimer();
+            enableAntiCheat();
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer');
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("El tiempo de la evaluación ha expirado.");
+                    autoSubmitExam();
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function enableAntiCheat() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    warningCount++;
+                    if (warningCount < 3) {
+                        alert(`¡ADVERTENCIA (${warningCount}/3)! Has salido de la ventana de la evaluación. Al acumular 3 advertencias el examen se enviará automáticamente.`);
+                    } else {
+                        alert("Has cambiado de pestaña o minimizado la ventana en repetidas ocasiones. El examen se enviará por seguridad.");
+                        autoSubmitExam();
+                    }
+                }
+            });
+        }
+
+        function autoSubmitExam() {
+            clearInterval(timerInterval);
+            calculateScore();
+        }
+
+        function submitExam(event) {
+            event.preventDefault();
+            if (confirm("¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.")) {
+                clearInterval(timerInterval);
+                calculateScore();
+            }
+        }
+
+        function calculateScore() {
+            let score = 0;
+            const formData = new FormData(document.getElementById('exam-form'));
+
+            for (let [key, value] of formData.entries()) {
+                if (correctAnswers[key] === value) {
+                    score++;
+                }
+            }
+
+            document.getElementById('exam-section').classList.add('hidden');
+            document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('result-section').classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = `${score} / 10`;
+
+            let feedback = "";
+            if (score >= 8) {
+                feedback = "¡Nivel Excelente! Posees bases sólidas en lógica, conjuntos y conceptos básicos de computación.";
+            } else if (score >= 5) {
+                feedback = "Nivel Regular. Tienes nociones generales, pero es recomendable repasar operaciones binarias y lógica proposicional.";
+            } else {
+                feedback = "Nivel Básico Inicial. Se requiere reforzar fuertemente los fundamentos de matemáticas discretas y lógica computacional.";
+            }
+            document.getElementById('feedback-text').textContent = feedback;
+        }
+    </script>
+</body>
+</html>
